@@ -16,3 +16,7 @@
   .smallPhotoUser > img {
     width : 120px;
   }
+  .loginBlockText {
+    color : pink;
+    text-decoration: none;
+  }

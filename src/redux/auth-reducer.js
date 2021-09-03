@@ -5,7 +5,6 @@ import { setUserStatus } from "./profile-reducer"
 const SET_USER_DATA = 'SET_USER_DATA'
 const SET_USER_PHOTO_SMALL = 'SET_USER_PHOTO_SMALL'
 
-debugger
 let initialState = {
     userId : null,
     email : null,
@@ -31,39 +30,29 @@ const authReducer = (state = initialState, action) => {
 }
 }
 
-
-
-
-
-
-
-
 export const setUserData = (userId, email, login, isAuth) => ({type: SET_USER_DATA, data: {userId, email, login, isAuth}})
 
 export const setUserPhotoSmall = (smallPhoto) => ({type: SET_USER_PHOTO_SMALL, smallPhoto})
 
 export const getMeTH = () => {
-  return (dispatch) => {
-    return authAPI.getMe().then((response) => {
+  return async (dispatch) => {
+    let response = await authAPI.getMe()
       if (response.resultCode === 0) {
         let id = response.data.id;
         let login = response.data.login;
         let email = response.data.email;
         dispatch(setUserData(id, email, login, true));
-        profileAPI.getStatus(id).then((response) => {
-          dispatch(setUserStatus(response.data))
-        })
-        authAPI.getMePhoto(id).then((response) => {
-          dispatch(setUserPhotoSmall(response));
-        });
+        let response_1 = await profileAPI.getStatus(id)
+        dispatch(setUserStatus(response_1.data))
+        let response_2 = await authAPI.getMePhoto(id)
+        dispatch(setUserPhotoSmall(response_2));
       }
-    });
   };
 };
 
 export const loginTH = (email, password, rememberMe) => {
-  return (dispatch) => {
-    authAPI.login(email, password, rememberMe).then(response => {
+  return async (dispatch) => {
+    let response = await authAPI.login(email, password, rememberMe)
       if (response.data.resultCode === 0) {
         dispatch(getMeTH())
       }
@@ -71,18 +60,15 @@ export const loginTH = (email, password, rememberMe) => {
         let message = response.data.messages.length > 0 ? response.data.messages[0] : 'Some error'
         dispatch(stopSubmit('login', { _error: message }))
       }
-    })
   };
 };
 
 export const logoutTH = () => {
-  return (dispatch) => {
-    authAPI.logout().then(response => {
+  return async (dispatch) => {
+    let response = await authAPI.logout()
       if (response.data.resultCode === 0) {
-        debugger
         dispatch(setUserData(null, null, null, false))
       }
-    })
   };
 };
 

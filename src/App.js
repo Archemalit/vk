@@ -1,9 +1,7 @@
 import React, {Component} from 'react'
-import {Route, withRouter} from 'react-router-dom'
+import {BrowserRouter, Route, withRouter} from 'react-router-dom'
 import Navbar from './components/Navbar/Navbar';
 import './App.css';
-import DialogsContainer from './components/Dialogs/DialogsContainer';
-import UsersContainer from './components/Users/UsersContainer';
 import ProfileContainer from './components/Profile/ProfileContainer';
 import HeaderComponent from './components/Header/HeaderContainer';
 import Login from './components/Login/Login';
@@ -11,8 +9,13 @@ import { compose } from 'redux';
 import { setInitializedTH } from './redux/app-reducer'
 import { getStatusTH } from './redux/profile-reducer'
 import { getMeTH } from './redux/auth-reducer'
-import { connect } from 'react-redux';
+import { connect, Provider } from 'react-redux';
 import Preloader from './components/common/preloader/preloader';
+import store from './redux/redux-store';
+import FastConnectAppComponents from './HOC/FastConnectAppComponents';
+
+const DialogsContainer = React.lazy(() => import('./components/Dialogs/DialogsContainer'))
+const UsersContainer = React.lazy(() => import('./components/Users/UsersContainer'))
 
 class App extends Component {
 
@@ -31,10 +34,10 @@ class App extends Component {
         <HeaderComponent />
         <Navbar />
         <div class="app-wrapper-content">
-          <Route render={ () => <ProfileContainer /> } path='/profile/:userId?' />
-          <Route render={ () => <DialogsContainer /> } path='/dialogs' />
-          <Route render={ () => <UsersContainer /> } path='/users' />
-          <Route render={ () => <Login /> } path='/login' />
+          <Route render={() => <ProfileContainer />} path="/profile/:userId?" />
+          <Route render={ FastConnectAppComponents(DialogsContainer) } path="/dialogs" />
+          <Route render={ FastConnectAppComponents(UsersContainer) } path="/users" />
+          <Route render={() => <Login />} path="/login" />
         </div>
       </div>
     );
@@ -46,7 +49,19 @@ const mapStateToProps = (state) => ({
   autoUserId : state.auth.userId
 })
 
-export default compose(
+const AppContainer = compose(
   withRouter,
   connect(mapStateToProps, { setInitializedTH, getStatusTH, getMeTH })
 )(App);
+
+const MainApp = (props) => {
+  return(
+    <BrowserRouter>
+    <Provider store={store} >
+      <AppContainer />
+    </Provider>
+    </BrowserRouter>
+  )
+}
+
+export default MainApp;

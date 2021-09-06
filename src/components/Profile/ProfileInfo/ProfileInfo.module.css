@@ -1,7 +1,10 @@
-.descriptionBlock{
+.descriptionBlock {
     padding: 10px;
 }
 
-.descriptionImage{
+.descriptionImage {
     width: 120px;
+}
+.contacts {
+    padding-left: 25px;
 }

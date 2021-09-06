@@ -1,9 +1,11 @@
 import { profileAPI } from "../api/api"
+import { getMeTH } from "./auth-reducer"
 
 const ADD_POST = 'ADD-POST'
 const SET_USER_PROFILE = 'SET-USER-PROFILE'
 const SET_STATUS = 'SET-STATUS'
 const DELETE_POST = 'DELETE-POST'
+const SET_OWMER_PHOTO = 'SET-OWMER-PHOTO'
 
 let initialState = {
   postData: [
@@ -12,7 +14,7 @@ let initialState = {
   ],
   newPostText: "it",
   profile: null,
-  status : ''
+  status : '',
 };
 
 const profileReducer = (state = initialState, action) => {
@@ -32,6 +34,8 @@ const profileReducer = (state = initialState, action) => {
             return {...state, profile : action.profile}
         case SET_STATUS:
             return {...state, status : action.status}
+        case SET_OWMER_PHOTO:
+          return {...state, profile : {...state.profile, photos : action.photos}}
         default:
             return state
     }
@@ -44,6 +48,8 @@ export const deletePost = (userId) => ({type: 'DELETE-POST', userId})
 export const setUserProfile = (profile) => ({type: SET_USER_PROFILE, profile})
 
 export const setUserStatus = (status) => ({type : SET_STATUS, status})
+
+export const setOwnerPhoto = (photos) => ({type : SET_OWMER_PHOTO, photos})
 
 export const getProfileTH = (userId) => {
     return async (dispatch) => {
@@ -66,6 +72,26 @@ export const updateStatusTH = (status) => {
         dispatch(setUserStatus(status));
       }
     }
+}
+
+export const savePhoto = (photos) => {
+  return async (dispatch) => {
+    let response = await profileAPI.savePhoto(photos);
+    if (response.data.resultCode === 0) {
+      await dispatch(getMeTH())
+      dispatch(setOwnerPhoto(response.data.data.photos));
+    }
+  }
+}
+
+export const saveProfile = (profile) => {
+  return async (dispatch, getState) => {
+    const userId = getState().auth.userId
+    let response = await profileAPI.saveProfile(profile);
+    if (response.data.resultCode === 0) {
+      dispatch(getProfileTH(userId));
+    }
+  }
 }
 
 export default profileReducer;

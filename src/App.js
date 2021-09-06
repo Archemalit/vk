@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {BrowserRouter, Route, withRouter} from 'react-router-dom'
+import {HashRouter, Route, withRouter} from 'react-router-dom'
 import Navbar from './components/Navbar/Navbar';
 import './App.css';
 import ProfileContainer from './components/Profile/ProfileContainer';
@@ -56,11 +56,11 @@ const AppContainer = compose(
 
 const MainApp = (props) => {
   return(
-    <BrowserRouter>
+    <HashRouter>
     <Provider store={store} >
       <AppContainer />
     </Provider>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
